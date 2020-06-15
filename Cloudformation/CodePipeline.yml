@@ -16,7 +16,7 @@ Parameters:
     Default: master
   GithubOAuthToken:
     Type: String
-    Default: ""
+    Default: "8e510c7d8c7b8b47ef04eedb1ed2ed50f2381ddf"
   ContainerPort:
     Type: Number
     Default: 8081
@@ -124,8 +124,8 @@ Resources:
               Repo: !Ref GithubRepo
               Branch: !Ref GithubBranch
               Owner: !Ref GithubUserName
-#              OAuthToken: !Ref GithubOAuthToken
-              OAuthToken: '{{resolve:secretsmanager:test/GitHub:SecretString:GitHubPersonalAccessToken}}'
+              OAuthToken: !Ref GithubOAuthToken
+#              OAuthToken: '{{resolve:secretsmanager:test/GitHub:SecretString:GitHubPersonalAccessToken}}'
             RunOrder: 1
             OutputArtifacts:
               - Name: source-output-artifacts
