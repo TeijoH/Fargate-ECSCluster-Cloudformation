@@ -16,10 +16,11 @@ Parameters:
     Default: master
   GithubOAuthToken:
     Type: String
-    Default: 8e510c7d8c7b8b47ef04eedb1ed2ed50f2381ddf
+    Default: "{{resolve:secretsmanager:CICD:SecretString:GitHubPersonalAccessToken}}"
+#    Default: 8e510c7d8c7b8b47ef04eedb1ed2ed50f2381ddf
   ContainerPort:
     Type: Number
-    Default: 8080
+    Default: 8081
 
 Resources:
 
@@ -124,7 +125,8 @@ Resources:
               Repo: !Ref GithubRepo
               Branch: !Ref GithubBranch
               Owner: !Ref GithubUserName
-              OAuthToken: !Ref GithubOAuthToken
+#              OAuthToken: !Ref GithubOAuthToken
+              OAuthToken: '{{resolve:secretsmanager:test/GitHub:SecretString:GitHubPersonalAccessToken}}'
             RunOrder: 1
             OutputArtifacts:
               - Name: source-output-artifacts
@@ -147,29 +149,32 @@ Resources:
             RunOrder: 1
 
         # Deploy the project by executing Fargate-Cluster.yml file in the Source code with Cloudformation.
-        - Name: Deploy
-          Actions:
-          - Name: Deploy
-            ActionTypeId:
-              Category: Deploy
-              Owner: AWS
-              Version: 1
-              Provider: CloudFormation
-            InputArtifacts:
-              - Name: source-output-artifacts
-              - Name: build-output-artifacts
-            Configuration:
-                ActionMode: CREATE_UPDATE
-                Capabilities: CAPABILITY_NAMED_IAM
-                # Pass parameter values to Fargate-Cluster.yml for deployment
-                ParameterOverrides: !Sub |
-                  {
-                    "ImageURI" : { "Fn::GetParam" : ["build-output-artifacts", "imageDetail.json", "ImageURI"] },
-                    "Stage":  "${Stage}",
-                    "ContainerPort": "${ContainerPort}"
-                  }
-                RoleArn: 
-                  Fn::GetAtt: [ CloudformationExecutionRole, Arn ]
-                StackName: !Join ['-', [!Ref Stage, !Ref 'AWS::AccountId', 'FargateECSCluster']]
-                TemplatePath: source-output-artifacts::Cloudformation/Fargate-Cluster.yml
-            RunOrder: 1
+        ## Comment this for later phase, no deployment to ECR"
+        
+#        - Name: Deploy
+#          Actions:
+#          - Name: Deploy
+#            ActionTypeId:
+#              Category: Deploy
+#              Owner: AWS
+#              Version: 1
+#              Provider: CloudFormation
+#            InputArtifacts:
+#              - Name: source-output-artifacts
+#              - Name: build-output-artifacts
+#            Configuration:
+#                ActionMode: CREATE_UPDATE
+#                Capabilities: CAPABILITY_NAMED_IAM
+#                # Pass parameter values to Fargate-Cluster.yml for deployment
+#                ParameterOverrides: !Sub |
+#                  {
+#                    "ImageURI" : { "Fn::GetParam" : ["build-output-artifacts", "imageDetail.json", "ImageURI"] },
+#                    "Stage":  "${Stage}",
+#                    "ContainerPort": "${ContainerPort}"
+#                  }
+#                RoleArn: 
+#                  Fn::GetAtt: [ CloudformationExecutionRole, Arn ]
+#                StackName: !Join ['-', [!Ref Stage, !Ref 'AWS::AccountId', 'FargateECSCluster']]
+#                TemplatePath: source-output-artifacts::Cloudformation/Fargate-Cluster.yml
+#            RunOrder: 1
+#            
