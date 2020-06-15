@@ -16,8 +16,7 @@ Parameters:
     Default: master
   GithubOAuthToken:
     Type: String
-    Default: "{{resolve:secretsmanager:CICD:SecretString:GitHubPersonalAccessToken}}"
-#    Default: 8e510c7d8c7b8b47ef04eedb1ed2ed50f2381ddf
+    Default: ""
   ContainerPort:
     Type: Number
     Default: 8081
